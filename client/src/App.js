@@ -13,7 +13,7 @@ const initialOptions = {
 function App() {
     return (
         <div className="App">
-            <PayPalScriptProvider options={initialOptions}>
+            <PayPalScriptProvider options={initialOptions} deferLoading={true}>
                 <Paypal />
             </PayPalScriptProvider>
         </div>
