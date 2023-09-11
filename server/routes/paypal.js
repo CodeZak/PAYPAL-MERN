@@ -120,4 +120,35 @@ router.get("/subscriptionInfo", async (req, res) => {
     return res.status(200).send(susbscriptionResponse.data);
 });
 
+//  An endpoint to cancel subscription
+
+router.post("/cancelSubscription", async (req, res) => {
+    const response = await axios.post(
+        `${PAYPAL_API_URL}/v1/oauth2/token`,
+        "grant_type=client_credentials",
+        {
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                Authorization: `Basic ${Buffer.from(
+                    `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
+                ).toString("base64")}`,
+            },
+        }
+    );
+    const accessToken = response.data.access_token;
+    //send subscription id as query parameter
+    const subscriptionId = req.query.subscriptionId;
+    const cancelSubscriptionResponse = await axios.post(
+        `${PAYPAL_API_URL}/v1/billing/subscriptions/${subscriptionId}/cancel`,
+        {},
+        {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${accessToken}`,
+            },
+        }
+    );
+    return res.status(200).send(cancelSubscriptionResponse.data);
+});
+
 export default router;
